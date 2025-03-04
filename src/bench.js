@@ -1,12 +1,14 @@
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
-import { bench_sql } from './sql_bench.js';
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { bench_sql } = require('./sql_bench.js');
 
-export async function bench() {
+async function bench() {
     bench_simple();
     await bench_sql();
 }
+
+module.exports = { bench };
 
 function bench_simple() {
     const start = process.hrtime.bigint();

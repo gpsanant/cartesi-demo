@@ -44,11 +44,9 @@ ENV PATH="/opt/cartesi/bin:${PATH}"
 
 WORKDIR /opt/cartesi/dapp
 COPY --from=build-stage /opt/cartesi/dapp .
-RUN yarn install && yarn build && \
-    yarn add global node-gyp && \
-    yarn rebuild sqlite3
+RUN yarn install 
 
 ENV ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:5004"
 
 ENTRYPOINT ["rollup-init"]
-CMD ["node", "dist/index.js"]
+CMD ["node", "src/index.js"]

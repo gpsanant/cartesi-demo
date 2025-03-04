@@ -1,10 +1,10 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
+const sqlite3 = require('sqlite3');
+const { open } = require('sqlite');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
-export async function bench_sql() {
+async function bench_sql() {
     const start = process.hrtime.bigint();
     const dbPath = path.join(os.tmpdir(), 'sql_benchmark.db');
     
@@ -237,3 +237,5 @@ async function insertTestData(db) {
         (4, 4, 1, 199.99)
     `);
 }
+
+module.exports = { bench_sql };
