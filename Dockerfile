@@ -10,11 +10,8 @@ FROM node:20.16.0-bookworm AS build-stage
 
 WORKDIR /opt/cartesi/dapp
 COPY . .
-RUN apt-get update && apt-get install -y sqlite3 libsqlite3-dev
-RUN yarn install && yarn build
 
 # runtime stage: produces final image that will be executed
-
 # Here the image's platform MUST be linux/riscv64.
 # Give preference to small base images, which lead to better start-up
 # performance when loading the Cartesi Machine.
@@ -35,7 +32,10 @@ apt-get update
 apt-get install -y --no-install-recommends \
   busybox-static=1:1.30.1-7ubuntu3 \
   sqlite3 \
-  libsqlite3-dev
+  libsqlite3-dev \
+  python3 \
+  python3-pip \
+  build-essential 
 rm -rf /var/lib/apt/lists/* /var/log/* /var/cache/*
 useradd --create-home --user-group dapp
 EOF
@@ -43,9 +43,12 @@ EOF
 ENV PATH="/opt/cartesi/bin:${PATH}"
 
 WORKDIR /opt/cartesi/dapp
-COPY --from=build-stage /opt/cartesi/dapp/dist .
+COPY --from=build-stage /opt/cartesi/dapp .
+RUN yarn install && yarn build && \
+    yarn add global node-gyp && \
+    yarn rebuild sqlite3
 
 ENV ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:5004"
 
 ENTRYPOINT ["rollup-init"]
-CMD ["node", "index.js"]
+CMD ["node", "dist/index.js"]
